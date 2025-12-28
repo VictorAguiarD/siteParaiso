@@ -4,8 +4,20 @@
 
 // HERO SLIDER
 let heroSlides = [
-    { type: 'image', url: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=1200' },
-    { type: 'video', url: 'https://assets.mixkit.co/videos/preview/mixkit-camping-under-the-stars-8765-large.mp4' }
+    {
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=1200',
+        tag: 'Temporada 2026',
+        title: 'Onde a infância vive aventuras inesquecíveis',
+        subtitle: 'Inscrições abertas para todas as idades'
+    },
+    {
+        type: 'video',
+        url: 'https://assets.mixkit.co/videos/preview/mixkit-camping-under-the-stars-8765-large.mp4',
+        tag: 'Experiência Única',
+        title: 'Noites Mágicas',
+        subtitle: 'Acampamento sob as estrelas'
+    }
 ];
 
 // GALERIA
@@ -15,8 +27,60 @@ let galleryPhotos = [
     'https://images.unsplash.com/photo-1464347755392-8072ef923139?q=80&w=400'
 ];
 
+// PACOTES
+let packages = [
+    {
+        title: 'Semana Júnior',
+        desc: '6 a 9 anos · Primeira experiência',
+        price: 400,
+        image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=600',
+        features: ['Atividades lúdicas', 'Segurança reforçada'],
+        badge: 'NOVO'
+    },
+    {
+        title: 'Semana Aventura',
+        desc: '8 a 12 anos · Trilhas e esportes',
+        price: 450,
+        image: 'https://images.unsplash.com/photo-1533512930330-4ac257c86793?q=80&w=600',
+        features: ['Trilhas', 'Jogos cooperativos'],
+        badge: ''
+    },
+    {
+        title: 'Semana Adolescente',
+        desc: '13 a 17 anos · Integração',
+        price: 550,
+        image: 'https://images.unsplash.com/photo-1526721940322-14a19e508817?q=80&w=600',
+        features: ['Gincanas', 'Noites temáticas'],
+        badge: ''
+    }
+];
+
 // INSCRIÇÃO
 let selectedWeek = null;
+
+
+/* =========================================================
+   UTILS (ALERTS & LIGHTBOX)
+========================================================= */
+function showAlert(title, message, icon = '🎉') {
+    document.getElementById('alert-title').innerText = title;
+    document.getElementById('alert-message').innerText = message;
+    document.getElementById('alert-icon').innerText = icon;
+    document.getElementById('custom-alert').style.display = 'flex';
+}
+
+function closeAlert() {
+    document.getElementById('custom-alert').style.display = 'none';
+}
+
+function openLightbox(url) {
+    document.getElementById('lightbox-img').src = url;
+    document.getElementById('lightbox').style.display = 'flex';
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').style.display = 'none';
+}
 
 
 /* =========================================================
@@ -45,6 +109,19 @@ function renderHero() {
         container.appendChild(div);
     });
 
+    // Atualiza textos do Hero (Baseado no slide atual)
+    const currentData = heroSlides[currentSlide] || heroSlides[0];
+    if (currentData) {
+        document.getElementById('hero-tag').innerText = currentData.tag || '';
+        document.getElementById('hero-title').innerText = currentData.title || '';
+        document.getElementById('hero-subtitle').innerText = currentData.subtitle || '';
+    } else {
+        // Fallback
+        document.getElementById('hero-tag').innerText = '';
+        document.getElementById('hero-title').innerText = '';
+        document.getElementById('hero-subtitle').innerText = '';
+    }
+
     startSliderLogic();
     renderAdminHeroList();
 }
@@ -59,6 +136,14 @@ function startSliderLogic() {
         slides[currentSlide].classList.remove('active');
         currentSlide = (currentSlide + 1) % slides.length;
         slides[currentSlide].classList.add('active');
+
+        // Atualiza textos ao trocar slide
+        const currentData = heroSlides[currentSlide];
+        if (currentData) {
+            document.getElementById('hero-tag').innerText = currentData.tag || '';
+            document.getElementById('hero-title').innerText = currentData.title || '';
+            document.getElementById('hero-subtitle').innerText = currentData.subtitle || '';
+        }
     }, 5000);
 }
 
@@ -77,10 +162,54 @@ function renderGallery() {
         const item = document.createElement('div');
         item.className = 'feed-item';
         item.style.backgroundImage = `url(${url})`;
+        item.onclick = () => openLightbox(url); // Adiciona click para lightbox
+        item.style.cursor = 'pointer';
         container.appendChild(item);
     });
 
     renderAdminGalleryList();
+}
+
+
+/* =========================================================
+   PACOTES (RENDERIZAÇÃO NA HOME)
+======================================================== */
+
+function renderPackages() {
+    const container = document.getElementById('packages-grid');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    packages.forEach((pkg, index) => {
+        // Cria lista de features
+        const featuresHtml = pkg.features.map(f => `<li>✓ ${f}</li>`).join('');
+
+        // Badge opcional
+        const badgeHtml = pkg.badge ? `<span class="badge">${pkg.badge}</span>` : '';
+
+        const div = document.createElement('div');
+        div.className = `premium-card ${index === 0 ? 'destaque' : ''}`;
+
+        div.innerHTML = `
+            <div class="card-image" style="background-image:url('${pkg.image}')"></div>
+            <div class="card-body">
+                ${badgeHtml}
+                <h3>${pkg.title}</h3>
+                <p>${pkg.desc}</p>
+                <ul class="card-list">
+                    ${featuresHtml}
+                </ul>
+                <div class="card-footer">
+                    <span class="price">R$ ${pkg.price}</span>
+                    <button onclick="selectWeek('${pkg.title}','${pkg.desc}',${pkg.price})">Reservar</button>
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    renderAdminPackagesList();
 }
 
 
@@ -115,13 +244,35 @@ const heroUpload = document.getElementById('hero-upload');
 if (heroUpload) {
     heroUpload.addEventListener('change', function (e) {
         const file = e.target.files[0];
-        if (!file) return;
 
-        const type = file.type.startsWith('video') ? 'video' : 'image';
-        const url = URL.createObjectURL(file);
+        const type = file ? (file.type.startsWith('video') ? 'video' : 'image') : 'image';
+        const url = file ? URL.createObjectURL(file) : '';
 
-        heroSlides.push({ type, url });
+        const title = document.getElementById('hero-title-input').value;
+        const subtitle = document.getElementById('hero-subtitle-input').value;
+        const tag = document.getElementById('hero-tag-input').value;
+
+        if (!url && !title) {
+            showAlert('Erro', 'Selecione uma imagem ou preencha os textos.', '⚠️');
+            return;
+        }
+
+        heroSlides.push({
+            type,
+            url: url || 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=1200', // fallback se não tiver imagem nova
+            tag,
+            title,
+            subtitle
+        });
+
         renderHero();
+        showAlert('Sucesso', 'Novo slide adicionado!');
+
+        // Limpar inputs
+        document.getElementById('hero-title-input').value = '';
+        document.getElementById('hero-subtitle-input').value = '';
+        document.getElementById('hero-tag-input').value = '';
+        e.target.value = ''; // reset file input
     });
 }
 
@@ -144,25 +295,8 @@ function renderAdminGalleryList() {
         `;
     });
 }
-function renderAdminHeroList() {
-    const list = document.getElementById('admin-hero-list');
-    if (!list) return;
+// Remove duplicate renderAdminHeroList
 
-    list.innerHTML = '';
-
-    heroSlides.forEach((slide, index) => {
-        list.innerHTML += `
-            <div class="manage-item"
-                 style="background-image:${slide.type === 'image' ? `url(${slide.url})` : 'none'};
-                 background-color:#222">
-                ${slide.type === 'video'
-                    ? '<small>VÍDEO</small>'
-                    : '<small>IMAGEM</small>'}
-                <button class="del-btn" onclick="deleteHeroSlide(${index})">×</button>
-            </div>
-        `;
-    });
-}
 
 function deleteGalleryPhoto(index) {
     galleryPhotos.splice(index, 1);
@@ -179,6 +313,72 @@ if (galleryUpload) {
         galleryPhotos.unshift(url);
         renderGallery();
     });
+}
+
+
+
+/* =========================================================
+   ADMIN - PACOTES
+======================================================== */
+
+function renderAdminPackagesList() {
+    const list = document.getElementById('admin-packages-list');
+    if (!list) return;
+
+    list.innerHTML = '';
+
+    packages.forEach((pkg, index) => {
+        list.innerHTML += `
+            <div class="manage-item" style="display:flex; flex-direction:column; align-items:flex-start; height:auto; padding:10px;">
+                <div style="font-weight:bold; font-size:14px">${pkg.title}</div>
+                <div style="font-size:12px; opacity:0.7">${pkg.desc}</div>
+                <div style="font-size:12px; margin-top:4px">R$ ${pkg.price}</div>
+                
+                <button class="del-btn" onclick="deletePackage(${index})" style="top:5px; right:5px">×</button>
+            </div>
+        `;
+    });
+}
+
+function deletePackage(index) {
+    if (confirm('Tem certeza que deseja remover este pacote?')) {
+        packages.splice(index, 1);
+        renderPackages();
+    }
+}
+
+// Handler para adicionar pacote
+function handleAddPackage(e) {
+    e.preventDefault();
+
+    const title = document.getElementById('pkg-title').value;
+    const desc = document.getElementById('pkg-desc').value;
+    const price = document.getElementById('pkg-price').value;
+
+    const fileInput = document.getElementById('pkg-image-file');
+    const file = fileInput.files[0];
+    const image = file ? URL.createObjectURL(file) : 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=600';
+
+    // Tratando features (separadas por vírgula no input ou apenas 1 por simplicidade)
+    // Vamos assumir que o usuário digita features separadas por vírgula
+    const featuresInput = document.getElementById('pkg-features').value;
+    const features = featuresInput ? featuresInput.split(',').map(s => s.trim()) : [];
+
+    const newPkg = {
+        title,
+        desc,
+        price,
+        image,
+        features,
+        badge: '' // Simples por enquanto
+    };
+
+    packages.push(newPkg);
+    renderPackages();
+
+    // Limpar form
+    e.target.reset();
+    showAlert('Sucesso', 'Pacote adicionado com sucesso!');
 }
 
 
@@ -226,14 +426,13 @@ function submitForm(event) {
     event.preventDefault();
 
     if (!selectedWeek) {
-        alert('Selecione uma semana antes de continuar.');
+        showAlert('Atenção', 'Selecione uma semana antes de continuar.', '⚠️');
         return;
     }
 
-    alert(
-        `Inscrição confirmada!\n\n` +
+    showAlert('Sucesso',
+        `Inscrição confirmada!\n` +
         `Semana: ${selectedWeek.nome}\n` +
-        `Faixa etária: ${selectedWeek.idade}\n` +
         `Valor: R$ ${selectedWeek.preco},00`
     );
 
@@ -248,4 +447,6 @@ function submitForm(event) {
 window.onload = () => {
     renderHero();
     renderGallery();
+    renderPackages();
+
 };

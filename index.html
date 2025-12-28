@@ -1,206 +1,231 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <title>Acampamento Paraíso | Inscrições</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar">
-    <div class="nav-container">
-        <div class="logo">
-            <div class="logo-box">AP</div>
-            <span>Acampamento Paraíso</span>
-        </div>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-box">AP</div>
+                <span>Acampamento Paraíso</span>
+            </div>
 
-        <div class="nav-actions">
-            <div class="cart">
-                <i data-lucide="shopping-bag"></i>
-                <span id="cart-count">0</span>
+            <div class="nav-actions">
+                <div class="cart">
+                    <i data-lucide="shopping-bag"></i>
+                    <span id="cart-count">0</span>
+                </div>
             </div>
         </div>
+    </nav>
+
+    <!-- HERO DINÂMICO -->
+    <header class="hero">
+        <div id="hero-slides-container"></div>
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content" id="hero-content">
+            <span class="hero-tag" id="hero-tag"></span>
+            <h1 id="hero-title"></h1>
+            <p id="hero-subtitle"></p>
+            <a href="#semanas" class="btn-primary">Ver Temporadas</a>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO -->
+    <main>
+
+        <section id="semanas" class="section">
+            <h2 class="section-title">Escolha a Temporada</h2>
+
+            <div class="cards-grid" id="packages-grid">
+                <!-- Preenchido via JavaScript (renderPackages) -->
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Momentos no Paraíso</h2>
+            <div class="social-feed" id="main-gallery"></div>
+        </section>
+
+    </main>
+
+    <!-- CHECKOUT -->
+    <div id="checkout-overlay" class="overlay">
+        <div class="drawer">
+            <div class="drawer-header">
+                <h2>Inscrição</h2>
+                <button onclick="closeCheckout()"><i data-lucide="x"></i></button>
+            </div>
+
+            <div id="selected-summary" class="summary-box"></div>
+
+            <form class="form-pro" onsubmit="submitForm(event)">
+                <h4>Dados da Criança</h4>
+                <input type="text" placeholder="Nome" required>
+                <input type="number" placeholder="Idade" required>
+
+                <h4>Responsável</h4>
+                <input type="text" placeholder="Nome" required>
+                <input type="email" placeholder="E-mail" required>
+                <input type="tel" placeholder="WhatsApp" required>
+
+                <label class="checkbox">
+                    <input type="checkbox" required>
+                    Autorizo a participação
+                </label>
+
+                <button class="btn-confirm">Confirmar Inscrição</button>
+            </form>
+        </div>
     </div>
-</nav>
 
-<!-- HERO DINÂMICO -->
-<header class="hero">
-    <div id="hero-slides-container"></div>
-    <div class="hero-overlay"></div>
+    <!-- ADMIN PANEL -->
+    <div id="admin-panel" class="admin-panel">
 
-    <div class="hero-content">
-        <span class="hero-tag">Temporada 2026</span>
-        <h1>Onde a infância vive aventuras inesquecíveis</h1>
-        <p>Inscrições abertas para todas as idades</p>
-        <a href="#semanas" class="btn-primary">Ver Temporadas</a>
-    </div>
-</header>
+        <div class="admin-header">
+            <div>
+                <h3>Painel Administrativo</h3>
+                <p class="admin-subtitle">Gerencie o conteúdo visual do site</p>
+            </div>
+            <button onclick="toggleAdmin()">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
 
-<!-- CONTEÚDO -->
-<main>
+        <!-- MENU LATERAL SIMPLES -->
+        <div class="admin-menu">
+            <button id="tab-btn-hero" class="active" onclick="switchTab('hero')">
+                <i data-lucide="film"></i> Hero do Site
+            </button>
+            <button id="tab-btn-galeria" onclick="switchTab('galeria')">
+                <i data-lucide="image"></i> Galeria
+            </button>
+            <button id="tab-btn-pacotes" onclick="switchTab('pacotes')">
+                <i data-lucide="package"></i> Pacotes
+            </button>
+        </div>
 
-<section id="semanas" class="section">
-    <h2 class="section-title">Escolha a Temporada</h2>
+        <!-- HERO -->
+        <div id="admin-tab-hero" class="tab-content active">
+            <div class="admin-section">
+                <h4>Hero Principal</h4>
+                <p>Gerencie imagens e vídeos exibidos no topo do site.</p>
 
-    <div class="cards-grid">
-        <!-- JUNIOR -->
-        <div class="premium-card destaque">
-            <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=600')"></div>
-            <div class="card-body">
-                <span class="badge">NOVO</span>
-                <h3>Semana Júnior</h3>
-                <p>6 a 9 anos · Primeira experiência</p>
-                <ul class="card-list">
-                    <li>✓ Atividades lúdicas</li>
-                    <li>✓ Segurança reforçada</li>
-                </ul>
-                <div class="card-footer">
-                    <span class="price">R$ 400</span>
-                    <button onclick="selectWeek('Semana Júnior','6 a 9 anos',400)">Reservar</button>
+                <div class="form-pro" style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:15px;">
+                    <input type="text" id="hero-title-input" placeholder="Título Principal"
+                        style="width:100%; margin-bottom:8px;">
+                    <input type="text" id="hero-subtitle-input" placeholder="Subtítulo"
+                        style="width:100%; margin-bottom:8px;">
+                    <input type="text" id="hero-tag-input" placeholder="Tag (ex: Temporada 2026)"
+                        style="width:100%; margin-bottom:8px;">
+
+                    <label class="upload-btn">
+                        <i data-lucide="upload-cloud"></i>
+                        Escolher Mídia e Adicionar
+                        <input type="file" id="hero-upload" hidden accept="image/*,video/mp4">
+                    </label>
+                </div>
+
+                <div id="admin-hero-list" class="admin-manage-list"></div>
+            </div>
+        </div>
+
+        <!-- GALERIA -->
+        <div id="admin-tab-galeria" class="tab-content">
+            <div class="admin-section">
+                <h4>Galeria de Fotos</h4>
+                <p>Fotos exibidas na seção “Momentos no Paraíso”.</p>
+
+                <label class="upload-btn secondary">
+                    <i data-lucide="image-plus"></i>
+                    Adicionar Foto
+                    <input type="file" id="gallery-upload" hidden accept="image/*">
+                </label>
+
+                <div id="admin-gallery-list" class="admin-manage-list"></div>
+            </div>
+        </div>
+
+        <!-- PACOTES -->
+        <div id="admin-tab-pacotes" class="tab-content">
+            <div class="admin-section">
+                <h4>Gerenciar Pacotes</h4>
+                <p>Adicione ou remova os pacotes de temporada.</p>
+
+                <form onsubmit="handleAddPackage(event)" class="form-pro"
+                    style="margin-bottom:20px; background:#f9f9f9; padding:15px; border-radius:8px;">
+                    <input type="text" id="pkg-title" placeholder="Nome do Pacote (ex: Semana Júnior)" required
+                        style="margin-bottom:8px; width:100%">
+                    <input type="text" id="pkg-desc" placeholder="Descrição (ex: 6 a 9 anos)" required
+                        style="margin-bottom:8px; width:100%">
+                    <input type="number" id="pkg-price" placeholder="Preço (apenas números)" required
+                        style="margin-bottom:8px; width:100%">
+                    <input type="text" id="pkg-features" placeholder="Destaques (separados por vírgula)"
+                        style="margin-bottom:8px; width:100%">
+                    <input type="text" id="pkg-features" placeholder="Destaques (separados por vírgula)"
+                        style="margin-bottom:8px; width:100%">
+
+                    <label class="upload-btn secondary" style="margin-bottom:8px; justify-content:center;">
+                        <i data-lucide="image-plus"></i> Imagem do Pacote
+                        <input type="file" id="pkg-image-file" hidden accept="image/*">
+                    </label>
+
+                    <button type="submit" class="upload-btn"
+                        style="width:100%; justify-content:center; margin-top:5px;">
+                        <i data-lucide="plus-circle"></i> Adicionar Pacote
+                    </button>
+                </form>
+
+                <h5>Pacotes Ativos:</h5>
+                <div id="admin-packages-list" class="admin-manage-list" style="grid-template-columns: 1fr; gap:10px;">
                 </div>
             </div>
         </div>
 
-        <!-- AVENTURA -->
-        <div class="premium-card">
-            <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1533512930330-4ac257c86793?q=80&w=600')"></div>
-            <div class="card-body">
-                <h3>Semana Aventura</h3>
-                <p>8 a 12 anos · Trilhas e esportes</p>
-                <ul class="card-list">
-                    <li>✓ Trilhas</li>
-                    <li>✓ Jogos cooperativos</li>
-                </ul>
-                <div class="card-footer">
-                    <span class="price">R$ 450</span>
-                    <button onclick="selectWeek('Semana Aventura','8 a 12 anos',450)">Reservar</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ADOLESCENTE -->
-        <div class="premium-card">
-            <div class="card-image" style="background-image:url('https://images.unsplash.com/photo-1526721940322-14a19e508817?q=80&w=600')"></div>
-            <div class="card-body">
-                <h3>Semana Adolescente</h3>
-                <p>13 a 17 anos · Integração</p>
-                <ul class="card-list">
-                    <li>✓ Gincanas</li>
-                    <li>✓ Noites temáticas</li>
-                </ul>
-                <div class="card-footer">
-                    <span class="price">R$ 550</span>
-                    <button onclick="selectWeek('Semana Adolescente','13 a 17 anos',550)">Reservar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="section">
-    <h2 class="section-title">Momentos no Paraíso</h2>
-    <div class="social-feed" id="main-gallery"></div>
-</section>
-
-</main>
-
-<!-- CHECKOUT -->
-<div id="checkout-overlay" class="overlay">
-    <div class="drawer">
-        <div class="drawer-header">
-            <h2>Inscrição</h2>
-            <button onclick="closeCheckout()"><i data-lucide="x"></i></button>
-        </div>
-
-        <div id="selected-summary" class="summary-box"></div>
-
-        <form class="form-pro" onsubmit="submitForm(event)">
-            <h4>Dados da Criança</h4>
-            <input type="text" placeholder="Nome" required>
-            <input type="number" placeholder="Idade" required>
-
-            <h4>Responsável</h4>
-            <input type="text" placeholder="Nome" required>
-            <input type="email" placeholder="E-mail" required>
-            <input type="tel" placeholder="WhatsApp" required>
-
-            <label class="checkbox">
-                <input type="checkbox" required>
-                Autorizo a participação
-            </label>
-
-            <button class="btn-confirm">Confirmar Inscrição</button>
-        </form>
-    </div>
-</div>
-
-<!-- ADMIN PANEL -->
-<div id="admin-panel" class="admin-panel">
-
-    <div class="admin-header">
-        <div>
-            <h3>Painel Administrativo</h3>
-            <p class="admin-subtitle">Gerencie o conteúdo visual do site</p>
-        </div>
-        <button onclick="toggleAdmin()">
-            <i data-lucide="x"></i>
-        </button>
     </div>
 
-    <!-- MENU LATERAL SIMPLES -->
-    <div class="admin-menu">
-        <button id="tab-btn-hero" class="active" onclick="switchTab('hero')">
-            <i data-lucide="film"></i> Hero do Site
-        </button>
-        <button id="tab-btn-galeria" onclick="switchTab('galeria')">
-            <i data-lucide="image"></i> Galeria
-        </button>
-    </div>
+    <button class="admin-trigger" onclick="toggleAdmin()">
+        <i data-lucide="settings"></i>
+    </button>
 
-    <!-- HERO -->
-    <div id="admin-tab-hero" class="tab-content active">
-        <div class="admin-section">
-            <h4>Hero Principal</h4>
-            <p>Gerencie imagens e vídeos exibidos no topo do site.</p>
 
-            <label class="upload-btn">
-                <i data-lucide="upload-cloud"></i>
-                Adicionar novo Hero
-                <input type="file" id="hero-upload" hidden accept="image/*,video/mp4">
-            </label>
-
-            <div id="admin-hero-list" class="admin-manage-list"></div>
+    <!-- CUSTOM ALERT MODAL -->
+    <div id="custom-alert" class="overlay"
+        style="display:none; align-items:center; justify-content:center; z-index:4000;">
+        <div class="summary-box"
+            style="background:white; max-width:400px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.2);">
+            <div id="alert-icon" style="font-size:3rem; margin-bottom:10px;">🎉</div>
+            <h3 id="alert-title">Sucesso!</h3>
+            <p id="alert-message" style="margin:10px 0 20px; color:#666;">Operação realizada.</p>
+            <button class="btn-confirm" onclick="closeAlert()">Entendi</button>
         </div>
     </div>
 
-    <!-- GALERIA -->
-    <div id="admin-tab-galeria" class="tab-content">
-        <div class="admin-section">
-            <h4>Galeria de Fotos</h4>
-            <p>Fotos exibidas na seção “Momentos no Paraíso”.</p>
-
-            <label class="upload-btn secondary">
-                <i data-lucide="image-plus"></i>
-                Adicionar Foto
-                <input type="file" id="gallery-upload" hidden accept="image/*">
-            </label>
-
-            <div id="admin-gallery-list" class="admin-manage-list"></div>
-        </div>
+    <!-- LIGHTBOX -->
+    <div id="lightbox" class="overlay"
+        style="display:none; align-items:center; justify-content:center; z-index:5000; background:rgba(0,0,0,0.9);"
+        onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="Zoom"
+            style="max-height:90vh; max-width:90vw; border-radius:10px; box-shadow:0 0 20px rgba(0,0,0,0.5);">
+        <button onclick="closeLightbox()"
+            style="position:absolute; top:20px; right:20px; background:none; border:none; color:white; font-size:2rem; cursor:pointer;">×</button>
     </div>
 
-</div>
-
-<button class="admin-trigger" onclick="toggleAdmin()">
-    <i data-lucide="settings"></i>
-</button>
-
-<script src="script.js"></script>
-<script>lucide.createIcons()</script>
+    <script src="script.js"></script>
+    <script>lucide.createIcons()</script>
 </body>
+
 </html>
