@@ -22,7 +22,26 @@
                 <span>Acampamento Paraíso</span>
             </div>
 
+            <!-- Mobile Menu Overlay -->
+            <div class="mobile-overlay" onclick="toggleMobileMenu()"></div>
+
+            <button class="hamburger-btn" onclick="toggleMobileMenu()">
+                <i data-lucide="menu"></i>
+            </button>
+
             <div class="nav-actions">
+                <a href="social.html" class="link-social">
+                    <i data-lucide="users" style="width:16px;vertical-align:middle"></i> Comunidade
+                </a>
+
+                <button id="register-btn-nav" class="btn-login register"
+                    onclick="openLoginModal(); switchAuthMode('register')">
+                    <span>Cadastrar</span>
+                </button>
+
+                <button id="login-btn" class="btn-login" onclick="openLoginModal(); switchAuthMode('login')">
+                    <i data-lucide="user"></i> <span>Entrar</span>
+                </button>
                 <div class="cart">
                     <i data-lucide="shopping-bag"></i>
                     <span id="cart-count">0</span>
@@ -74,13 +93,13 @@
 
             <form class="form-pro" onsubmit="submitForm(event)">
                 <h4>Dados da Criança</h4>
-                <input type="text" placeholder="Nome" required>
-                <input type="number" placeholder="Idade" required>
+                <input type="text" id="checkout-child-name" placeholder="Nome" required>
+                <input type="number" id="checkout-child-age" placeholder="Idade" required>
 
                 <h4>Responsável</h4>
-                <input type="text" placeholder="Nome" required>
-                <input type="email" placeholder="E-mail" required>
-                <input type="tel" placeholder="WhatsApp" required>
+                <input type="text" id="checkout-parent-name" placeholder="Nome" required>
+                <input type="email" id="checkout-parent-email" placeholder="E-mail" required>
+                <input type="tel" id="checkout-parent-phone" placeholder="WhatsApp" required>
 
                 <label class="checkbox">
                     <input type="checkbox" required>
@@ -88,6 +107,77 @@
                 </label>
 
                 <button class="btn-confirm">Confirmar Inscrição</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- LOGIN/REGISTER MODAL -->
+    <div id="login-modal" class="overlay"
+        style="display:none; align-items:center; justify-content:center; z-index:5000;">
+        <div class="modal-box" id="auth-modal-box">
+            <button class="close-modal" onclick="closeLoginModal()">×</button>
+
+            <!-- TABS -->
+            <div class="auth-tabs">
+                <button id="tab-login" class="active" onclick="switchAuthMode('login')">Entrar</button>
+                <button id="tab-register" onclick="switchAuthMode('register')">Cadastrar</button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <div id="login-content" class="auth-content">
+                <h3>Bem-vindo de volta!</h3>
+                <p style="margin-bottom:20px; color:#666">Identifique-se para continuar.</p>
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <input type="email" id="login-email" placeholder="E-mail" required class="input-modern">
+                    <!-- Password field -->
+                    <input type="password" placeholder="Senha" class="input-modern">
+                    <button type="submit" class="btn-primary full">Entrar</button>
+                </form>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div id="register-content" class="auth-content" style="display:none">
+                <h3>Criar Conta</h3>
+                <p style="margin-bottom:20px; color:#666">Junte-se à comunidade Paraíso.</p>
+                <form id="register-form" onsubmit="handleRegister(event)">
+                    <input type="text" id="reg-name" placeholder="Nome Completo" required class="input-modern">
+                    <input type="email" id="reg-email" placeholder="E-mail" required class="input-modern">
+
+                    <label style="font-size:12px; color:#666; display:block; margin-bottom:4px">Data de
+                        Nascimento</label>
+                    <input type="date" id="reg-dob" required class="input-modern">
+
+                    <input type="password" id="reg-pass" placeholder="Senha" required class="input-modern">
+                    <input type="password" id="reg-pass-conf" placeholder="Confirmar Senha" required
+                        class="input-modern">
+
+                    <button type="submit" class="btn-primary full">Cadastrar</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- NEW POST MODAL -->
+    <div id="post-modal" class="overlay"
+        style="display:none; align-items:center; justify-content:center; z-index:5000;">
+        <div class="modal-box">
+            <button class="close-modal" onclick="closePostModal()">×</button>
+            <h3>Novo Post</h3>
+
+            <form id="post-form" onsubmit="handleNewPost(event)">
+                <div class="image-upload-preview" id="post-preview-area"
+                    onclick="document.getElementById('post-image').click()">
+                    <i data-lucide="image"></i>
+                    <span>Clique para adicionar foto</span>
+                    <img id="post-preview-img" src="" style="display:none">
+                </div>
+                <input type="file" id="post-image" hidden accept="image/*" onchange="previewPostImage(event)">
+
+                <textarea id="post-caption" placeholder="Escreva uma legenda..." rows="3"
+                    class="input-modern"></textarea>
+
+                <button type="submit" class="btn-primary full">Publicar</button>
             </form>
         </div>
     </div>

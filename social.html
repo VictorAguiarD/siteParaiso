@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Comunidade Paraíso</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="social.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo" style="text-decoration:none">
+                <div class="logo-box">AP</div>
+                <span>Acampamento Paraíso</span>
+            </a>
+
+            <div class="nav-actions">
+                <a href="index.html"
+                    style="color:var(--dark); font-weight:600; font-size:14px; margin-right:15px;">Voltar ao Site</a>
+
+                <button id="login-btn" class="btn-login" onclick="openLoginModal()">
+                    <i data-lucide="user"></i> <span>Entrar</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTEÚDO -->
+    <main style="padding-top:100px;">
+        <section class="section">
+            <div class="section-header-row">
+                <h2 class="section-title">Comunidade Paraíso</h2>
+                <button class="btn-primary small" onclick="openPostModal()" id="btn-new-post" style="display:none">
+                    <i data-lucide="plus-square"></i> Novo Post
+                </button>
+            </div>
+
+            <div class="social-feed-container" id="social-feed">
+                <!-- Posts renderizados via JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- LOGIN/REGISTER MODAL (Reused structure) -->
+    <div id="login-modal" class="overlay"
+        style="display:none; align-items:center; justify-content:center; z-index:5000;">
+        <div class="modal-box" id="auth-modal-box">
+            <button class="close-modal" onclick="closeLoginModal()">×</button>
+
+            <div class="auth-tabs">
+                <button id="tab-login" class="active" onclick="switchAuthMode('login')">Entrar</button>
+                <button id="tab-register" onclick="switchAuthMode('register')">Cadastrar</button>
+            </div>
+
+            <div id="login-content" class="auth-content">
+                <h3>Bem-vindo de volta!</h3>
+                <p style="margin-bottom:20px; color:#666">Identifique-se para continuar.</p>
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <input type="email" id="login-email" placeholder="E-mail" required class="input-modern">
+                    <small style="display:block; margin:5px 0 15px; color:#888;">Use "admin@..." para poderes de
+                        Deus.</small>
+                    <input type="password" placeholder="Senha (simbólico)" class="input-modern">
+                    <button type="submit" class="btn-primary full">Entrar</button>
+                </form>
+            </div>
+
+            <div id="register-content" class="auth-content" style="display:none">
+                <h3>Criar Conta</h3>
+                <form id="register-form" onsubmit="handleRegister(event)">
+                    <input type="text" id="reg-name" placeholder="Nome Completo" required class="input-modern">
+                    <input type="email" id="reg-email" placeholder="E-mail" required class="input-modern">
+                    <label style="font-size:12px; color:#666; display:block; margin-bottom:4px">Data de
+                        Nascimento</label>
+                    <input type="date" id="reg-dob" required class="input-modern">
+                    <input type="password" id="reg-pass" placeholder="Senha" required class="input-modern">
+                    <input type="password" id="reg-pass-conf" placeholder="Confirmar Senha" required
+                        class="input-modern">
+                    <button type="submit" class="btn-primary full">Cadastrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW POST MODAL -->
+    <div id="post-modal" class="overlay"
+        style="display:none; align-items:center; justify-content:center; z-index:5000;">
+        <div class="modal-box">
+            <button class="close-modal" onclick="closePostModal()">×</button>
+            <h3>Novo Post</h3>
+            <form id="post-form" onsubmit="handleNewPost(event)">
+                <div class="image-upload-preview" id="post-preview-area"
+                    onclick="document.getElementById('post-image').click()">
+                    <i data-lucide="image"></i>
+                    <span>Clique para adicionar foto</span>
+                    <img id="post-preview-img" src="" style="display:none">
+                </div>
+                <input type="file" id="post-image" hidden accept="image/*" onchange="previewPostImage(event)">
+                <textarea id="post-caption" placeholder="Escreva uma legenda..." rows="3"
+                    class="input-modern"></textarea>
+                <button type="submit" class="btn-primary full">Publicar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- CUSTOM ALERT -->
+    <div id="custom-alert" class="overlay"
+        style="display:none; align-items:center; justify-content:center; z-index:4000;">
+        <div class="summary-box" style="background:white; max-width:400px; text-align:center;">
+            <div id="alert-icon" style="font-size:3rem; margin-bottom:10px;">🎉</div>
+            <h3 id="alert-title">Sucesso!</h3>
+            <p id="alert-message" style="margin:10px 0 20px; color:#666;">Operação realizada.</p>
+            <button class="btn-confirm" onclick="closeAlert()">Entendi</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="social.js"></script>
+    <script>lucide.createIcons()</script>
+</body>
+
+</html>

@@ -1,9 +1,15 @@
 /* =========================================================
-   BANCO DE DADOS EM MEMÓRIA (SIMULADO)
+   BANCO DE DADOS EM MEMÓRIA (SIMULADO + PERSISTÊNCIA)
 ========================================================= */
 
+const STORAGE_KEYS = {
+    HERO: 'siteParaiso_hero',
+    GALLERY: 'siteParaiso_gallery',
+    PACKAGES: 'siteParaiso_packages'
+};
+
 // HERO SLIDER
-let heroSlides = [
+let defaultHeroSlides = [
     {
         type: 'image',
         url: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?q=80&w=1200',
@@ -20,15 +26,29 @@ let heroSlides = [
     }
 ];
 
+let heroSlides = JSON.parse(localStorage.getItem(STORAGE_KEYS.HERO)) || defaultHeroSlides;
+
+function saveHero() {
+    localStorage.setItem(STORAGE_KEYS.HERO, JSON.stringify(heroSlides));
+}
+
+
 // GALERIA
-let galleryPhotos = [
+let defaultGalleryPhotos = [
     'https://images.unsplash.com/photo-1517164459100-2812051947a7?q=80&w=400',
     'https://images.unsplash.com/photo-1506484381205-f7945653044d?q=80&w=400',
     'https://images.unsplash.com/photo-1464347755392-8072ef923139?q=80&w=400'
 ];
 
+let galleryPhotos = JSON.parse(localStorage.getItem(STORAGE_KEYS.GALLERY)) || defaultGalleryPhotos;
+
+function saveGallery() {
+    localStorage.setItem(STORAGE_KEYS.GALLERY, JSON.stringify(galleryPhotos));
+}
+
+
 // PACOTES
-let packages = [
+let defaultPackages = [
     {
         title: 'Semana Júnior',
         desc: '6 a 9 anos · Primeira experiência',
@@ -54,6 +74,13 @@ let packages = [
         badge: ''
     }
 ];
+
+let packages = JSON.parse(localStorage.getItem(STORAGE_KEYS.PACKAGES)) || defaultPackages;
+
+function savePackages() {
+    localStorage.setItem(STORAGE_KEYS.PACKAGES, JSON.stringify(packages));
+}
+
 
 // INSCRIÇÃO
 let selectedWeek = null;
@@ -237,6 +264,7 @@ function renderAdminHeroList() {
 
 function deleteHeroSlide(index) {
     heroSlides.splice(index, 1);
+    saveHero(); // PERSIST
     renderHero();
 }
 
@@ -265,6 +293,7 @@ if (heroUpload) {
             subtitle
         });
 
+        saveHero(); // PERSIST
         renderHero();
         showAlert('Sucesso', 'Novo slide adicionado!');
 
@@ -300,6 +329,7 @@ function renderAdminGalleryList() {
 
 function deleteGalleryPhoto(index) {
     galleryPhotos.splice(index, 1);
+    saveGallery(); // PERSIST
     renderGallery();
 }
 
@@ -311,6 +341,7 @@ if (galleryUpload) {
 
         const url = URL.createObjectURL(file);
         galleryPhotos.unshift(url);
+        saveGallery(); // PERSIST
         renderGallery();
     });
 }
@@ -343,6 +374,7 @@ function renderAdminPackagesList() {
 function deletePackage(index) {
     if (confirm('Tem certeza que deseja remover este pacote?')) {
         packages.splice(index, 1);
+        savePackages(); // PERSIST
         renderPackages();
     }
 }
@@ -374,6 +406,7 @@ function handleAddPackage(e) {
     };
 
     packages.push(newPkg);
+    savePackages(); // PERSIST
     renderPackages();
 
     // Limpar form
@@ -384,9 +417,21 @@ function handleAddPackage(e) {
 
 /* =========================================================
    UI / ADMIN CONTROLS
+   (Protegido: só abre se for admin)
 ========================================================= */
 
+function toggleMobileMenu() {
+    const navActions = document.querySelector('.nav-actions');
+    const overlay = document.querySelector('.mobile-overlay');
+    navActions.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
+
 function toggleAdmin() {
+    if (!currentUser || !currentUser.isAdmin) {
+        showAlert('Acesso Negado', 'Você não tem permissão para acessar o painel.', '🚫');
+        return;
+    }
     document.getElementById('admin-panel')?.classList.toggle('active');
 }
 
@@ -414,6 +459,12 @@ function selectWeek(nome, idade, preco) {
         <p><strong>Faixa etária:</strong> ${idade}</p>
         <p class="price">R$ ${preco},00</p>
     `;
+
+    // Auto-fill se estiver logado
+    if (currentUser) {
+        document.getElementById('checkout-parent-name').value = currentUser.name;
+        document.getElementById('checkout-parent-email').value = currentUser.email;
+    }
 
     document.getElementById('checkout-overlay').style.display = 'block';
 }
@@ -444,9 +495,197 @@ function submitForm(event) {
    INIT
 ========================================================= */
 
+// Mock Data (Moved here from deleted block)
+let currentUser = JSON.parse(localStorage.getItem('siteParaiso_currentUser')) || null;
+let registeredUsers = JSON.parse(localStorage.getItem('siteParaiso_users')) || [];
+
+function saveUsers() {
+    localStorage.setItem('siteParaiso_users', JSON.stringify(registeredUsers));
+}
+
+// AUTH FUNCTIONS
+function openLoginModal() {
+    document.getElementById('login-modal').style.display = 'flex';
+    switchAuthMode('login'); // Default to login
+}
+
+function closeLoginModal() {
+    document.getElementById('login-modal').style.display = 'none';
+}
+
+function switchAuthMode(mode) {
+    const loginTab = document.getElementById('tab-login');
+    const registerTab = document.getElementById('tab-register');
+    const loginContent = document.getElementById('login-content');
+    const registerContent = document.getElementById('register-content');
+
+    if (mode === 'login') {
+        loginTab.classList.add('active');
+        registerTab.classList.remove('active');
+        loginContent.style.display = 'block';
+        registerContent.style.display = 'none';
+    } else {
+        loginTab.classList.remove('active');
+        registerTab.classList.add('active');
+        loginContent.style.display = 'none';
+        registerContent.style.display = 'block';
+    }
+}
+
+function calculateAge(dobString) {
+    const birthday = new Date(dobString);
+    const ageDifMs = Date.now() - birthday.getTime();
+    const ageDate = new Date(ageDifMs); // miliseconds from epoch
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
+}
+
+function handleRegister(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('reg-name').value;
+    const email = document.getElementById('reg-email').value;
+    const dob = document.getElementById('reg-dob').value;
+    const pass = document.getElementById('reg-pass').value;
+    const passConf = document.getElementById('reg-pass-conf').value;
+
+    // 1. Validate Age
+    if (calculateAge(dob) < 18) {
+        showAlert('Acesso Negado', 'Você precisa ter 18 anos ou mais para se cadastrar.', '🔞');
+        return;
+    }
+
+    // 2. Validate Password
+    if (pass !== passConf) {
+        showAlert('Erro', 'As senhas não coincidem.', '❌');
+        return;
+    }
+
+    const isAdmin = (email === 'paraisoadmin@gmail.com');
+    // 3. Create User
+    const newUser = {
+        name: isAdmin ? 'Equipe Paraíso' : name, // FORCE ADMIN NAME
+        email,
+        dob,
+        avatar: isAdmin ? 'https://ui-avatars.com/api/?name=EP&background=000&color=fff' : `https://ui-avatars.com/api/?name=${name}&background=random`,
+        isAdmin: isAdmin
+    };
+
+    registeredUsers.push(newUser);
+    saveUsers();
+
+    // 4. Auto Login
+    loginUser(newUser);
+    e.target.reset();
+}
+
+function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+
+    // Check if user exists in registered list
+    const foundUser = registeredUsers.find(u => u.email === email);
+
+    if (foundUser) {
+        // Enforce update if needed (optional, but good for legacy users)
+        if (foundUser.email === 'paraisoadmin@gmail.com' && foundUser.name !== 'Equipe Paraíso') {
+            foundUser.name = 'Equipe Paraíso';
+            foundUser.avatar = 'https://ui-avatars.com/api/?name=EP&background=000&color=fff';
+            saveUsers();
+        }
+        loginUser(foundUser);
+    } else {
+        // Fallback for "Guest" or unregister login (as per visitor logic)
+        const isAdmin = (email === 'paraisoadmin@gmail.com');
+        const tempUser = {
+            name: isAdmin ? 'Equipe Paraíso' : email.split('@')[0], // FORCE ADMIN NAME
+            email: email,
+            avatar: isAdmin ? 'https://ui-avatars.com/api/?name=EP&background=000&color=fff' : `https://ui-avatars.com/api/?name=${email}&background=random`,
+            isAdmin: isAdmin
+        };
+        loginUser(tempUser);
+    }
+}
+
+function loginUser(user) {
+    currentUser = user;
+    localStorage.setItem('siteParaiso_currentUser', JSON.stringify(user));
+    updateUIAuth();
+    closeLoginModal();
+    if (typeof renderFeed === 'function') renderFeed();
+    showAlert('Bem-vindo!', `Olá, ${user.name}! Acesso permitido.`, '👋');
+}
+
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('siteParaiso_currentUser');
+    updateUIAuth();
+    if (typeof renderFeed === 'function') renderFeed();
+}
+
+function updateUIAuth() {
+    const btn = document.getElementById('login-btn');
+    const newPostBtn = document.getElementById('btn-new-post');
+    const adminBtn = document.querySelector('.admin-trigger');
+
+    const registerBtn = document.getElementById('register-btn-nav');
+
+    // Remove existing auth buttons from nav to prevent duplicates
+    const existingLogout = document.getElementById('btn-logout-nav');
+    if (existingLogout) existingLogout.remove();
+
+    if (currentUser) {
+        // HIDE REGISTER BUTTON
+        if (registerBtn) registerBtn.style.display = 'none';
+
+        // PERFIL
+        btn.innerHTML = `
+            <img src="${currentUser.avatar}" class="avatar-small">
+            <span>${currentUser.name}</span>
+        `;
+        btn.classList.add('logged-in');
+        btn.onclick = null;
+
+        // LOGOUT BUTTON
+        const logoutBtn = document.createElement('button');
+        logoutBtn.id = 'btn-logout-nav';
+        logoutBtn.className = 'btn-login';
+        logoutBtn.innerHTML = `<i data-lucide="log-out"></i>`;
+        logoutBtn.title = "Sair";
+        logoutBtn.onclick = logout;
+        logoutBtn.style.color = 'var(--danger)';
+        logoutBtn.style.marginLeft = '5px';
+
+        // Insert after Profile
+        btn.parentNode.insertBefore(logoutBtn, btn.nextSibling);
+
+
+        if (newPostBtn) newPostBtn.style.display = 'flex';
+
+        if (currentUser.isAdmin && adminBtn) {
+            adminBtn.style.display = 'flex';
+        } else if (adminBtn) {
+            adminBtn.style.display = 'none';
+        }
+
+    } else {
+        // SHOW REGISTER BUTTON
+        if (registerBtn) registerBtn.style.display = 'flex';
+
+        btn.innerHTML = `<i data-lucide="user"></i> <span>Entrar</span>`;
+        btn.classList.remove('logged-in');
+        btn.onclick = openLoginModal;
+
+        if (newPostBtn) newPostBtn.style.display = 'none';
+        if (adminBtn) adminBtn.style.display = 'none';
+    }
+    lucide.createIcons();
+}
+
+
 window.onload = () => {
     renderHero();
     renderGallery();
     renderPackages();
-
+    // renderFeed(); // Removed from here, handled in social.js
+    updateUIAuth(); // Check initial auth state
 };
