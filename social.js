@@ -2,29 +2,15 @@
    SOCIAL NETWORK LOGIC
 ========================================================= */
 
-// Mock Data
-let socialPosts = [
-    {
-        id: 1,
-        user: { name: 'Mariana Silva', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150' },
-        image: 'https://images.unsplash.com/photo-1517164459100-2812051947a7?q=80&w=600',
-        caption: 'Meu filho amou a semana de aventuras! Já quer voltar ano que vem! 🏕️',
-        likes: 24,
-        comments: [
-            { user: 'Equipe Paraíso', text: 'Que alegria ler isso, Mariana! Esperamos vocês!' }
-        ],
-        likedByMe: false
-    },
-    {
-        id: 2,
-        user: { name: 'João Pedro', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150' },
-        image: 'https://images.unsplash.com/photo-1506484381205-f7945653044d?q=80&w=600',
-        caption: 'Pôr do sol incrível no acampamento. #Natureza #Paz',
-        likes: 45,
-        comments: [],
-        likedByMe: false
-    }
-];
+// Persistence
+const SOCIAL_STORAGE_KEY = 'siteParaiso_social_posts';
+
+// Initialize socialPosts from localStorage or empty array
+let socialPosts = JSON.parse(localStorage.getItem(SOCIAL_STORAGE_KEY)) || [];
+
+function saveSocialPosts() {
+    localStorage.setItem(SOCIAL_STORAGE_KEY, JSON.stringify(socialPosts));
+}
 
 // We need to ensure currentUser is available. 
 // script.js runs first, so it initializes currentUser from localStorage.
@@ -36,6 +22,18 @@ function renderFeed() {
     if (!list) return;
 
     list.innerHTML = '';
+
+    if (socialPosts.length === 0) {
+        list.innerHTML = `
+            <div class="empty-feed">
+                <i data-lucide="camera-off" style="width: 48px; height: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                <p>Nenhuma foto publicada ainda.</p>
+                <p>Seja o primeiro a compartilhar um momento!</p>
+            </div>
+        `;
+        lucide.createIcons();
+        return;
+    }
 
     socialPosts.forEach(post => {
         // Comments HTML
@@ -118,6 +116,7 @@ function toggleLike(postId) {
             post.likes++;
             post.likedByMe = true;
         }
+        saveSocialPosts();
         renderFeed();
     }
 }
@@ -138,6 +137,7 @@ function addComment(postId) {
             user: currentUser.name,
             text: text
         });
+        saveSocialPosts();
         renderFeed();
     }
 }
@@ -145,6 +145,7 @@ function addComment(postId) {
 function deletePost(postId) {
     if (confirm('ADM: Remover este post?')) {
         socialPosts = socialPosts.filter(p => p.id !== postId);
+        saveSocialPosts();
         renderFeed();
         showAlert('Admin', 'Post removido com sucesso!');
     }
@@ -155,6 +156,7 @@ function deleteComment(postId, commentIndex) {
         const post = socialPosts.find(p => p.id === postId);
         if (post) {
             post.comments.splice(commentIndex, 1);
+            saveSocialPosts();
             renderFeed();
         }
     }
@@ -200,6 +202,7 @@ function handleNewPost(e) {
     };
 
     socialPosts.unshift(newPost); // Add to top
+    saveSocialPosts();
     renderFeed();
     closePostModal();
 

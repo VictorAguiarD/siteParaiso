@@ -162,3 +162,17 @@
     cursor: pointer;
     font-size: 13px;
 }
+
+/* Empty State */
+.empty-feed {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    border: 1px dashed #ddd;
+    color: #666;
+}
+
+.empty-feed p {
+    margin: 5px 0;
+}
